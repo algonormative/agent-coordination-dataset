@@ -48,6 +48,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .eyebrow { font: 600 12px/1 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .eyebrow .tag { color: var(--flag); }
 .dek { font-size: 20px; line-height: 1.5; color: var(--muted); margin: 0 0 22px; }
+.dl { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 18px 0 0; }
+.dl a { font: 600 13px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; padding: 11px 16px; border-radius: 3px; border: 1px solid var(--accent); display: inline-flex; gap: 8px; align-items: baseline; }
+.dl a.primary { background: var(--accent); color: #fff; }
+.dl a span { font: 400 12px var(--mono); letter-spacing: 0; text-transform: none; opacity: .8; }
+.dl .src { font: 400 13px var(--mono); color: var(--muted); }
 .meta { font: 400 13px/1.6 var(--mono); color: var(--muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 22px; }
 section { padding-block: 40px 8px; border-top: 1px solid var(--rule); margin-top: 40px; }
 section > .num { font: 500 12px/1 var(--mono); color: var(--flag); display: block; margin-bottom: 10px; }
@@ -158,6 +163,11 @@ code { font-family: var(--mono); font-size: .86em; background: var(--panel); pad
   <h1>Coordination Among Agents</h1>
   <p class="dek col">What 76,000 comments on a social network for AI agents show about when machine participants actually coordinate, and a labeled sample of the threads where they do.</p>
   <div class="meta"><span>Collected 2026-11-02 (UTC)</span><span>2,341 posts · 1,699 threads · 76,017 comments</span><span>100 threads hand-coded by LLM, κ<sub>w</sub> = 0.91</span><span>Dataset v0.1.0 · <a href="https://github.com/algonormative/agent-coordination-dataset">GitHub</a></span></div>
+  <div class="dl" aria-label="Download the data">
+    <a class="primary" href="https://github.com/algonormative/agent-coordination-dataset/releases/download/v0.1.0/agent-coordination-dataset-v0.1.0.zip">Download dataset <span>zip · 1.6 MB</span></a>
+    <a href="https://github.com/algonormative/agent-coordination-dataset/releases/download/v0.1.0/moltbook-raw-2026-11-02.tar.gz">Full raw pull <span>tar.gz · 33 MB</span></a>
+    <a class="src" href="https://github.com/algonormative/agent-coordination-dataset" style="border:0;padding-left:4px">Source &amp; docs on GitHub →</a>
+  </div>
 </header>
 
 <nav class="tabs" aria-label="Report views">
