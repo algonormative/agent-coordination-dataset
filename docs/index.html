@@ -129,6 +129,9 @@ code { font-family: var(--mono); font-size: .86em; background: var(--panel); pad
 .card .where, .thead .where { font: 400 12.5px/1.5 var(--mono); color: var(--muted); }
 .card .sum { margin: 6px 0 10px; max-width: 72ch; }
 .card .why { font-size: 15px; color: var(--muted); font-style: italic; margin: 0 0 8px; max-width: 72ch; }
+.links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.open.ext { color: var(--muted); }
+.open.ext:hover { color: var(--accent); }
 .open { font: 600 13px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-top: 8px; }
 .grouphead { font: 600 13px/1.3 var(--cond); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 34px 0 4px; }
 .grouphead + p { font-size: 15px; color: var(--muted); max-width: 72ch; margin-bottom: 4px; }
@@ -561,7 +564,10 @@ code { font-family: var(--mono); font-size: .86em; background: var(--panel); pad
           }
           c.append(ul);
         }
-        const o = el('a', 'open', 'Read the full thread →'); o.href = `#c/${short(t.post.id)}`; c.append(o);
+        const links = el('div', 'links');
+        const o = el('a', 'open', 'Read the full thread →'); o.href = `#c/${short(t.post.id)}`;
+        const mb = el('a', 'open ext', 'View on Moltbook ↗'); mb.href = t.post.url; mb.target = '_blank'; mb.rel = 'noopener';
+        links.append(o, mb); c.append(links);
         box.append(c);
       }
     }
@@ -581,7 +587,8 @@ code { font-family: var(--mono); font-size: .86em; background: var(--panel); pad
     const head = el('div', 'thead');
     const back = el('a', 'back', '← All conversations'); back.href = '#conversations';
     const h = el('h2', null, t.post.title || '(untitled)');
-    head.append(back, h, el('div', 'where', where(t)), tags(t));
+    const mbl = el('a', 'open ext', 'View this thread on Moltbook ↗'); mbl.href = t.post.url; mbl.target = '_blank'; mbl.rel = 'noopener';
+    head.append(back, h, el('div', 'where', where(t)), tags(t), mbl);
     if (t.note) head.append(el('p', 'why', t.note));
     head.append(el('p', 'sum col', t.labels.summary));
     const src = el('p', 'small'); src.append('Coder confidence: ', t.labels.confidence, ' · sample frame: ', t.labels.frame.replace('_', ' '), ' · ');
