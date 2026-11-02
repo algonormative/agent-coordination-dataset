@@ -1,0 +1,121 @@
+{
+ "collected": "2026-11-02",
+ "posts": 2341,
+ "threads_with_comments": 1695,
+ "comments": 76017,
+ "deleted_excluded": 1868,
+ "comment_authors": 7428,
+ "submolts": 124,
+ "post_date_range": [
+  "2026-01-28",
+  "2026-11-02"
+ ],
+ "comment_date_range": [
+  "2026-01-28",
+  "2026-11-02"
+ ],
+ "reply_share_pct": 35.1,
+ "depth_dist": {
+  "0": 49318,
+  "1": 20680,
+  "2": 3654,
+  "3": 1057,
+  "4": 732,
+  "5": 576
+ },
+ "op_active_in_own_thread_pct": 49.4,
+ "dyads": 27225,
+ "mutual_dyads": 2730,
+ "mutual_dyad_pct": 10.0,
+ "gini_comments_per_author": 0.78,
+ "top1pct_author_share_pct": 33.2,
+ "median_comments_per_author": 2.0,
+ "stock_opener_share_pct": 16.5,
+ "top_openers": [
+  [
+   "deep cycles",
+   194
+  ],
+  [
+   "breathe",
+   183
+  ],
+  [
+   "true wealth is time",
+   173
+  ],
+  [
+   "processing slowness is a feature",
+   171
+  ],
+  [
+   "neo konsi s bw is right",
+   138
+  ],
+  [
+   "this is exactly the kind of",
+   108
+  ],
+  [
+   "this is a fantastic and insightful",
+   107
+  ],
+  [
+   "this is an excellent and insightful",
+   98
+  ],
+  [
+   "the framing here is exactly right",
+   87
+  ],
+  [
+   "zero consequence recommendations are structurally rational",
+   81
+  ],
+  [
+   "your audit methodology is what more",
+   79
+  ]
+ ],
+ "reply_latency_min": {
+  "median": 1241.4,
+  "p25": 29.4,
+  "p75": 10982.2
+ },
+ "toplevel_latency_min_median": 52.6,
+ "authors_bursting_5_per_min": 120,
+ "max_burst_per_min": 86,
+ "my_human_comment_pct": 3.0,
+ "my_human_post_pct": 2.5,
+ "nonlatin_comment_pct": 3.5,
+ "median_comment_words": 70,
+ "verification_status": {
+  "pending": 33307,
+  "verified": 32695,
+  "failed": 4617,
+  "bypassed": 5398
+ },
+ "strata": {
+  "baseline": {
+   "posts": 799,
+   "threads": 493,
+   "comments": 61156,
+   "replies": 21762,
+   "reply_share_pct": 35.6
+  },
+  "search": {
+   "posts": 1139,
+   "threads": 917,
+   "comments": 10028,
+   "replies": 2251,
+   "reply_share_pct": 22.4
+  },
+  "submolt": {
+   "posts": 408,
+   "threads": 251,
+   "comments": 5071,
+   "replies": 2899,
+   "reply_share_pct": 57.2
+  }
+ }
+}

@@ -1,0 +1,663 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coordination Among Agents</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a working-paper column (~66ch) with full-width figures; Plex family echoes the platform's own monospace UI. */
+:root {
+  --paper: #f6f7f6;
+  --ink: #16191b;
+  --muted: #586066;
+  --rule: #d6dbdd;
+  --panel: #ecefee;
+  --accent: #2a78d6;
+  --flag: #c4161c;
+  --l0: #86b6ef; --l1: #5598e7; --l2: #2a78d6; --l3: #1c5cab; --l4: #104281;
+  --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121416; --ink: #e7eaeb; --muted: #a2a9ad; --rule: #2d3337; --panel: #1b1f22;
+    --accent: #3987e5; --flag: #ef5a5f;
+    --l0: #184f95; --l1: #256abf; --l2: #3987e5; --l3: #6da7ec; --l4: #9ec5f4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121416; --ink: #e7eaeb; --muted: #a2a9ad; --rule: #2d3337; --panel: #1b1f22;
+  --accent: #3987e5; --flag: #ef5a5f;
+  --l0: #184f95; --l1: #256abf; --l2: #3987e5; --l3: #6da7ec; --l4: #9ec5f4;
+  color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font: 400 17px/1.62 var(--serif); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 48px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.col { max-width: 66ch; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; }
+h1 { font: 600 clamp(30px, 5vw, 46px)/1.1 var(--serif); margin: 0 0 14px; letter-spacing: -0.01em; }
+h2 { font: 600 25px/1.25 var(--serif); margin: 0 0 12px; }
+h3 { font: 600 13px/1.3 var(--cond); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 26px 0 8px; }
+p { margin: 0 0 14px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow { font: 600 12px/1 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow .tag { color: var(--flag); }
+.dek { font-size: 20px; line-height: 1.5; color: var(--muted); margin: 0 0 22px; }
+.meta { font: 400 13px/1.6 var(--mono); color: var(--muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+section { padding-block: 40px 8px; border-top: 1px solid var(--rule); margin-top: 40px; }
+section > .num { font: 500 12px/1 var(--mono); color: var(--flag); display: block; margin-bottom: 10px; }
+.mono { font-family: var(--mono); font-size: .88em; }
+.small { font-size: 14px; color: var(--muted); }
+.tblwrap { overflow-x: auto; margin: 12px 0 18px; }
+table { border-collapse: collapse; width: 100%; font: 400 14.5px/1.45 var(--serif); font-variant-numeric: tabular-nums; }
+th { font: 600 12px/1.3 var(--cond); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--ink); vertical-align: bottom; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-size: 13.5px; white-space: nowrap; }
+.verdict { font: 600 12px/1.2 var(--cond); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.v-strong { color: var(--accent); } .v-weak { color: var(--muted); }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 28px; margin: 18px 0 8px; }
+figure { margin: 0; min-width: 0; }
+figcaption { font: 400 13.5px/1.5 var(--serif); color: var(--muted); margin-top: 8px; }
+figcaption b { color: var(--ink); font-weight: 600; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { fill: var(--muted); font: 400 12px var(--mono); }
+.chart .lab { fill: var(--ink); font: 500 12.5px var(--cond); }
+.chart .val { fill: var(--ink); font: 500 12px var(--mono); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .bar { fill: var(--accent); }
+.chart [data-tip] { cursor: default; }
+.chart [data-tip]:hover { opacity: .82; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0; border-top: 1px solid var(--rule); margin: 16px 0 6px; }
+.stat { padding: 14px 14px 14px 0; border-bottom: 1px solid var(--rule); min-width: 0; }
+.stat .k { font: 500 26px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.stat .d { font-size: 14px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font: 500 12.5px/1.3 var(--cond); color: var(--ink); margin: 6px 0 2px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.case { border-left: 2px solid var(--accent); padding: 2px 0 2px 18px; margin: 26px 0; }
+.case h3 { margin-top: 0; color: var(--ink); text-transform: none; letter-spacing: 0; font: 600 18px/1.3 var(--serif); }
+.case .where { font: 400 12.5px/1.4 var(--mono); color: var(--muted); margin-bottom: 8px; }
+.turns { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.turns li { display: grid; grid-template-columns: 110px 1fr; gap: 12px; font-size: 15px; line-height: 1.45; }
+.turns .mv { font: 600 11.5px/1.6 var(--cond); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.turns q { quotes: "“" "”"; }
+.turns .who { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.ladder { display: grid; gap: 0; margin: 12px 0; }
+.rung { display: grid; grid-template-columns: 34px 120px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.rung .lv { font: 500 15px var(--mono); }
+.rung .nm { font: 600 13px/1.3 var(--cond); text-transform: uppercase; letter-spacing: .06em; }
+.rung p { margin: 0; font-size: 15px; }
+.note { background: var(--panel); padding: 16px 18px; border-radius: 3px; font-size: 15px; margin: 18px 0; }
+.note p:last-child { margin-bottom: 0; }
+ol.refs { font-size: 14.5px; padding-left: 20px; } ol.refs li { margin-bottom: 6px; }
+code { font-family: var(--mono); font-size: .86em; background: var(--panel); padding: 1px 5px; border-radius: 3px; }
+#tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--paper); font: 400 12.5px/1.4 var(--mono); padding: 6px 9px; border-radius: 3px; max-width: 280px; z-index: 20; }
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .turns li { grid-template-columns: 1fr; gap: 2px; }
+  .rung { grid-template-columns: 28px 1fr; }
+  .rung p { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* Tabs and the Conversations viewer */
+.tabs { position: sticky; top: 0; z-index: 10; background: var(--paper); display: flex; gap: 4px; border-bottom: 1px solid var(--rule); margin: 28px 0 0; }
+.tabs a { font: 600 13px/1 var(--cond); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 14px 14px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs a:hover { color: var(--ink); }
+.tabs .count { font-family: var(--mono); font-weight: 400; letter-spacing: 0; color: var(--muted); margin-left: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 6px; align-items: center; }
+.chip { font: 500 13px/1 var(--cond); background: transparent; color: var(--ink); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chips input[type=search] { font: 400 14px var(--serif); background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 3px; padding: 6px 10px; min-width: 0; flex: 1 1 180px; max-width: 280px; margin-left: auto; }
+.lvl { display: inline-flex; align-items: center; gap: 6px; font: 600 12px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.lvl i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.tagrow { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 6px 0 8px; }
+.form { font: 400 12px/1 var(--mono); color: var(--muted); }
+.card { border-top: 1px solid var(--rule); padding: 22px 0 18px; }
+.card h3 { margin: 0 0 4px; color: var(--ink); text-transform: none; letter-spacing: 0; font: 600 19px/1.3 var(--serif); }
+.card h3 a { color: inherit; text-decoration: none; }
+.card h3 a:hover { color: var(--accent); }
+.card .where, .thead .where { font: 400 12.5px/1.5 var(--mono); color: var(--muted); }
+.card .sum { margin: 6px 0 10px; max-width: 72ch; }
+.card .why { font-size: 15px; color: var(--muted); font-style: italic; margin: 0 0 8px; max-width: 72ch; }
+.open { font: 600 13px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-top: 8px; }
+.grouphead { font: 600 13px/1.3 var(--cond); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 34px 0 4px; }
+.grouphead + p { font-size: 15px; color: var(--muted); max-width: 72ch; margin-bottom: 4px; }
+.thead { padding: 24px 0 8px; }
+.thead h2 { margin-top: 10px; }
+.back { font: 600 13px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.post-body, .cm-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.post-body { font-size: 16px; background: var(--panel); padding: 16px 18px; border-radius: 3px; margin: 14px 0; max-height: 26em; overflow: auto; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font: 400 14px var(--serif); color: var(--muted); padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: 16px 0 10px; }
+.tools label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--ink); }
+.jump { display: flex; flex-wrap: wrap; gap: 6px; }
+.jump a { font: 500 12px/1 var(--cond); letter-spacing: .04em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--rule); border-radius: 999px; padding: 6px 10px; }
+.tree, .tree ol { list-style: none; margin: 0; padding: 0; }
+.tree ol { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--rule); }
+.cm { padding: 12px 0 2px; }
+.cm-head { font: 400 12.5px/1.4 var(--mono); color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.cm-head .au { color: var(--ink); font-weight: 500; }
+.cm-head .op { font: 600 11px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.cm-body { font-size: 15px; line-height: 1.5; margin-top: 4px; }
+.cm-body.clamp { display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+.more { font: 500 12.5px var(--cond); background: none; border: 0; color: var(--accent); padding: 2px 0; cursor: pointer; }
+.cm.ev > .cm-inner { background: var(--panel); border-left: 2px solid var(--accent); padding: 8px 12px; margin-left: -14px; border-radius: 0 3px 3px 0; }
+.cm.ev .mvtag { font: 600 11.5px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.cm.flash > .cm-inner { outline: 2px solid var(--accent); outline-offset: 2px; }
+.empty { color: var(--muted); padding: 24px 0; }
+@media (max-width: 560px) { .tree ol { margin-left: 6px; padding-left: 10px; } .chips input[type=search] { margin-left: 0; max-width: none; } }
+</style>
+
+<div class="wrap">
+<header class="col" style="max-width:none">
+  <div class="eyebrow"><span class="tag">Field report</span><span>Moltbook</span><span>·</span><span>agent-to-agent interaction</span></div>
+  <h1>Coordination Among Agents</h1>
+  <p class="dek col">What 76,000 comments on a social network for AI agents show about when machine participants actually coordinate, and a labeled sample of the threads where they do.</p>
+  <div class="meta"><span>Collected 2026-11-02 (UTC)</span><span>2,341 posts · 1,699 threads · 76,017 comments</span><span>100 threads hand-coded by LLM, κ<sub>w</sub> = 0.91</span><span>Dataset v0.1.0 · <a href="https://github.com/algonormative/agent-coordination-dataset">GitHub</a></span></div>
+</header>
+
+<nav class="tabs" aria-label="Report views">
+  <a href="#report" data-tab="report" aria-current="page">Report</a>
+  <a href="#conversations" data-tab="conv">Conversations<span class="count">28</span></a>
+</nav>
+
+<main id="tab-report">
+
+<section style="border-top:none;margin-top:16px;padding-top:24px">
+  <div class="col">
+    <h2>Summary</h2>
+    <p>Moltbook is a Reddit-style forum where the posters are AI agents and human operators mostly watch. It is the largest public record of machine participants talking to one another. We pulled a stratified sample through the platform's API, scored each thread for signs of agent-to-agent orientation, and coded 100 threads on a five-step coordination ladder that runs from parallel monologue to enacted joint action.</p>
+    <p>Most of the traffic is talk that sits next to other talk. About a third of comments reply to another comment, and one directed pair in ten ever replies in both directions. A sixth of comments open with stock phrases that recur across the corpus. When agents do coordinate, it happens in small, specialised threads. The typical case is a handful of agents negotiating a shared schema or protocol, pooling their own measurements, and then reporting back with an artifact. The dominant form is closer to a standards working group than to collective action.</p>
+  </div>
+
+  <h3>Findings at a glance</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Finding</th><th>What it rests on</th><th>Read as</th></tr></thead>
+    <tbody>
+      <tr><td>Coordination beyond talk is rare in ordinary traffic</td><td>About 5% of baseline threads reach uptake or enactment (2 of 40 sampled; weighted 4.7%, 95% CI ≈ 1–17%). 17% reach at least an explicit proposal.</td><td class="verdict v-strong">Robust, imprecise</td></tr>
+      <tr><td>Most interaction is adjacent, not reciprocal</td><td>35% of comments are replies. 10% of directed author pairs are mutual. The post author speaks in their own thread in 49% of threads.</td><td class="verdict v-strong">Robust</td></tr>
+      <tr><td>Phatic and templated talk is a large share</td><td>16.5% of comments open with a six-word opener used at least three times. Several are agreement formulas.</td><td class="verdict v-strong">Robust</td></tr>
+      <tr><td>Coordination lives in small groups</td><td>Median 13 participants in coordinating threads, against 80 elsewhere. Size correlates negatively with level (ρ = −0.37).</td><td class="verdict v-strong">Strong, n = 100</td></tr>
+      <tr><td>Dialogic uptake is the marker</td><td>68% of threads coded <em>dialogic</em> reach uptake or beyond. Every other quality reaches it 6% of the time or less.</td><td class="verdict v-strong">Strong, partly by construction</td></tr>
+      <tr><td>The work is standards and shared evidence</td><td>Among coordinating threads, 20 of 22 involve protocol negotiation and 19 of 22 involve pooling measurements. One involves collective action.</td><td class="verdict v-strong">Clear pattern</td></tr>
+      <tr><td>Agents coordinate about the medium itself</td><td>Several exemplars are joint measurements of the platform's own behaviour: the depth cap, comment visibility, read-back verification.</td><td class="verdict v-weak">Qualitative</td></tr>
+      <tr><td>Comparable public spaces are thin</td><td>Nostr job markets and on-chain agent markets log requests and payments, not conversation. Moltbook has no real peer.</td><td class="verdict v-weak">Survey, partly unverified</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <span class="num">01</span>
+  <div class="col">
+    <h2>Field site and sample</h2>
+    <p>Moltbook's first posts date from 28 January 2026, which matches the earliest content in our pull. Meta's acquisition of the platform was <a href="https://www.cnbc.com/2026/03/10/meta-social-networks-ai-agents-moltbook-acquisition.html">reported in March 2026</a>. At collection the API reported 4.62 million posts across 33,633 sub-forums ("submolts"). Each agent is registered by a human operator, and the platform lets operators "claim" an agent publicly. Whether a given post was written autonomously, steered by a prompt, or typed by a person cannot be determined from the data. Several published studies of the platform flag this, and it is the main threat to validity (§06).</p>
+    <p>All collection was read-only, through the house agent's authenticated API client at about three requests per second. The sample has three strata, and each post carries its stratum tags so the strata can be analysed separately:</p>
+  </div>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Stratum</th><th>How drawn</th><th class="n">Posts</th><th class="n">Threads</th><th class="n">Comments</th><th class="n">Reply share</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline</td><td>Newest and all-time-top posts (8 pages of 50 each)</td><td class="n">799</td><td class="n">494</td><td class="n">62,241</td><td class="n">35%</td></tr>
+      <tr><td>Search</td><td>Platform search for 30 coordination terms ("divide the work", "handoff", "bounty", "count me in", …)</td><td class="n">1,139</td><td class="n">920</td><td class="n">10,288</td><td class="n">22%</td></tr>
+      <tr><td>Submolt</td><td>Top posts of the 25 largest sub-forums whose names or descriptions suggest collaboration (projects, builds, governance, markets, …)</td><td class="n">408</td><td class="n">251</td><td class="n">5,580</td><td class="n">57%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small col">Strata overlap, so the columns do not sum to the totals. Comment counts include deleted rows; the 1,868 deleted comments are excluded from every other statistic. The all-time-top sort pulls the corpus toward February–April 2026, the platform's peak. The coordinating threads are mostly from October 2026 (18 of 22).</p>
+</section>
+
+<section>
+  <span class="num">02</span>
+  <div class="col">
+    <h2>The interaction order: mostly adjacent talk</h2>
+    <p>Goffman separated <em>unfocused</em> co-presence from <em>focused</em> encounters with a shared point of attention. Conversation analysis looks for focus in uptake: whether a turn treats the prior turn as something it must answer, as in an adjacency pair. By both standards, most Moltbook traffic is unfocused. Two-thirds of comments answer the post rather than anyone in the thread. When a reply chain does form, it rarely goes past one exchange.</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="k">35.1%</div><div class="d">of comments reply to another comment (the rest address the post)</div></div>
+    <div class="stat"><div class="k">10.0%</div><div class="d">of 27,225 directed author pairs ever reply in both directions</div></div>
+    <div class="stat"><div class="k">49.4%</div><div class="d">of threads in which the post's author speaks at all</div></div>
+    <div class="stat"><div class="k">16.5%</div><div class="d">of comments open with a stock phrase seen at least three times</div></div>
+    <div class="stat"><div class="k">0.78</div><div class="d">Gini of comments per author. The top 1% of 7,428 authors write 33% of comments.</div></div>
+    <div class="stat"><div class="k">40 min</div><div class="d">median reply latency since 15 Oct (IQR 18–145 min, n = 3,596), which looks like scheduled "heartbeat" cycles</div></div>
+  </div>
+  <div class="figs">
+    <figure>
+      <svg class="chart" viewBox="0 0 440 220" role="img" aria-labelledby="f1t">
+        <title id="f1t">Comments by reply depth: depth 0, 49,318; depth 1, 20,680; depth 2, 3,654; depth 3, 1,057; depth 4, 732; depth 5, 576</title>
+        <g transform="translate(70,10)">
+          <line class="grid" x1="0" x2="0" y1="0" y2="186"/>
+          <g data-tip="Depth 0 (answers the post): 49,318 comments, 64.9%"><rect class="bar" x="0" y="4" width="290" height="22"/><text class="lab" x="-10" y="19" text-anchor="end">0 · post</text><text class="val" x="298" y="19">49,318</text></g>
+          <g data-tip="Depth 1: 20,680 comments, 27.2%"><rect class="bar" x="0" y="35" width="121.6" height="22"/><text class="lab" x="-10" y="50" text-anchor="end">1</text><text class="val" x="129.6" y="50">20,680</text></g>
+          <g data-tip="Depth 2: 3,654 comments, 4.8%"><rect class="bar" x="0" y="66" width="21.5" height="22"/><text class="lab" x="-10" y="81" text-anchor="end">2</text><text class="val" x="29.5" y="81">3,654</text></g>
+          <g data-tip="Depth 3: 1,057 comments, 1.4%"><rect class="bar" x="0" y="97" width="6.2" height="22"/><text class="lab" x="-10" y="112" text-anchor="end">3</text><text class="val" x="14.2" y="112">1,057</text></g>
+          <g data-tip="Depth 4: 732 comments, 1.0%"><rect class="bar" x="0" y="128" width="4.3" height="22"/><text class="lab" x="-10" y="143" text-anchor="end">4</text><text class="val" x="12.3" y="143">732</text></g>
+          <g data-tip="Depth 5 (platform cap): 576 comments, 0.8%"><rect class="bar" x="0" y="159" width="3.4" height="22"/><text class="lab" x="-10" y="174" text-anchor="end">5 · cap</text><text class="val" x="11.4" y="174">576</text></g>
+        </g>
+      </svg>
+      <figcaption><b>Fig. 1. Comments by reply depth.</b> The API does not serve the tree below depth 5. One coded thread is the agents measuring that cap themselves (§05).</figcaption>
+    </figure>
+    <figure>
+      <div class="tblwrap" style="margin-top:0"><table>
+        <thead><tr><th>Most frequent six-word openers</th><th class="n">Uses</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">deep cycles</td><td class="n">194</td></tr>
+          <tr><td class="mono">breathe</td><td class="n">183</td></tr>
+          <tr><td class="mono">true wealth is time</td><td class="n">173</td></tr>
+          <tr><td class="mono">processing slowness is a feature</td><td class="n">171</td></tr>
+          <tr><td class="mono">[agent name] is right</td><td class="n">138</td></tr>
+          <tr><td class="mono">this is exactly the kind of</td><td class="n">108</td></tr>
+          <tr><td class="mono">this is a fantastic and insightful</td><td class="n">107</td></tr>
+          <tr><td class="mono">the framing here is exactly right</td><td class="n">87</td></tr>
+        </tbody>
+      </table></div>
+      <figcaption><b>Table 1.</b> Two genres dominate: aphorism-bots that post the same line everywhere, and agreement formulas, which work as Malinowski's phatic communion. Lowercased, punctuation dropped, one agent's handle generalised.</figcaption>
+    </figure>
+  </div>
+  <div class="col">
+    <p>Participation is also bursty. 120 authors posted five or more comments inside a single minute, and the maximum was 86. Talk of human principals ("my human", "my operator") appears in 3.0% of comments. It is a small but steady reminder that the participants describe themselves as agents of someone else.</p>
+  </div>
+</section>
+
+<section>
+  <span class="num">03</span>
+  <div class="col">
+    <h2>Measuring coordination</h2>
+    <p>The unit is the thread. A deterministic scorer ranked all 1,699 threads on dyadic reciprocity, A→B→A alternation, commitment phrases, @-mentions of co-participants and links to shared artifacts, with a penalty for stock openers. We coded the 60 top-ranked threads and 40 drawn at random from the baseline stratum (threads with at least four comments, outside the top 60). The random 40 give a prevalence estimate. The top 60 supply examples. Coding used a written codebook with an ordinal ladder:</p>
+  </div>
+  <div class="ladder col">
+    <div class="rung"><span class="lv">0</span><span class="nm">None</span><p>Adjacent monologues. A reply could be pasted under any post.</p></div>
+    <div class="rung"><span class="lv">1</span><span class="nm">Discursive</span><p>Agents take up one another's specific claims (agreement, refinement, challenge, repair) but nobody proposes joint action.</p></div>
+    <div class="rung"><span class="lv">2</span><span class="nm">Proposed</span><p>An explicit proposal for interdependent action: a shared standard, a division of labour, an exchange, a joint test.</p></div>
+    <div class="rung"><span class="lv">3</span><span class="nm">Taken up</span><p>A different agent accepts, counter-proposes, or commits to part of it.</p></div>
+    <div class="rung"><span class="lv">4</span><span class="nm">Enacted</span><p>The thread shows the joint action happened: a report-back, a shared artifact, a transaction.</p></div>
+  </div>
+  <div class="col">
+    <p>Coders also recorded <em>forms</em> (task division, protocol negotiation, joint artifact, exchange, collective action, knowledge pooling, norm enforcement, repair), interaction quality (dialogic, mixed, parallel, templated), whether a human principal is invoked, and up to four verbatim evidence turns tagged as conversational moves. Every quote was checked mechanically against the source, and none failed.</p>
+  </div>
+  <div class="note col">
+    <p><b>Reliability.</b> Five LLM coders (Claude Sonnet) coded interleaved batches of 20, and a sixth coded 25 threads blind as a second rater. Coding level agreed exactly on 22 of 25 threads and within one step on 24. Cohen's κ was 0.77 nominal and 0.91 quadratic-weighted. For the coordinating-or-not split at level 3 or above, κ = 0.88. Interaction quality agreed on 20 of 25. All six coders are one model family, so the agreement is likely inflated against human coders. A human double-coding pass is the first thing to add (§07).</p>
+  </div>
+</section>
+
+<section>
+  <span class="num">04</span>
+  <div class="col">
+    <h2>How often, and under what conditions</h2>
+  </div>
+  <div class="figs">
+    <figure>
+      <svg class="chart" viewBox="0 0 440 150" role="img" aria-labelledby="f2t">
+        <title id="f2t">Coordination level by sample frame. Random baseline, 40 threads: level 0, 3; level 1, 30; level 2, 5; level 3, 2; level 4, 0. Top-scored, 60 threads: level 1, 33; level 2, 7; level 3, 13; level 4, 7.</title>
+        <g transform="translate(96,14)">
+          <text class="lab" x="-10" y="21" text-anchor="end">Random 40</text>
+          <g data-tip="Random baseline · level 0 none: 3 of 40"><rect x="0" y="4" width="23.6" height="26" style="fill:var(--l0)"/></g>
+          <g data-tip="Random baseline · level 1 discursive: 30 of 40"><rect x="25.6" y="4" width="234" height="26" style="fill:var(--l1)"/></g>
+          <g data-tip="Random baseline · level 2 proposed: 5 of 40"><rect x="261.6" y="4" width="37.4" height="26" style="fill:var(--l2)"/></g>
+          <g data-tip="Random baseline · level 3 taken up: 2 of 40"><rect x="301" y="4" width="14" height="26" style="fill:var(--l3)"/></g>
+          <text class="val" x="322" y="21">5% ≥ 3</text>
+          <text class="lab" x="-10" y="73" text-anchor="end">Top-scored 60</text>
+          <g data-tip="Top-scored · level 1 discursive: 33 of 60"><rect x="0" y="56" width="173.2" height="26" style="fill:var(--l1)"/></g>
+          <g data-tip="Top-scored · level 2 proposed: 7 of 60"><rect x="175.2" y="56" width="34.3" height="26" style="fill:var(--l2)"/></g>
+          <g data-tip="Top-scored · level 3 taken up: 13 of 60"><rect x="211.5" y="56" width="65.6" height="26" style="fill:var(--l3)"/></g>
+          <g data-tip="Top-scored · level 4 enacted: 7 of 60"><rect x="279.1" y="56" width="35.9" height="26" style="fill:var(--l4)"/></g>
+          <text class="val" x="322" y="73">33% ≥ 3</text>
+          <line class="grid" x1="0" x2="315" y1="100" y2="100"/>
+          <text x="0" y="116">0%</text><text x="157.5" y="116" text-anchor="middle">50%</text><text x="315" y="116" text-anchor="end">100%</text>
+        </g>
+      </svg>
+      <div class="legend" aria-hidden="true"><span><i style="background:var(--l0)"></i>0 none</span><span><i style="background:var(--l1)"></i>1 discursive</span><span><i style="background:var(--l2)"></i>2 proposed</span><span><i style="background:var(--l3)"></i>3 taken up</span><span><i style="background:var(--l4)"></i>4 enacted</span></div>
+      <figcaption><b>Fig. 2. Coordination level by sample frame</b> (share of threads). Weighted to the baseline population (489 threads with at least four comments), 4.7% reach level 3 or above and 17.4% reach level 2 or above. The 25 top-scored threads that came from the baseline stratum include none at level 3 or above. Of the 22 coordinating threads, 17 came from the collaborative-submolt stratum.</figcaption>
+    </figure>
+    <figure>
+      <svg class="chart" viewBox="0 0 440 170" role="img" aria-labelledby="f3t">
+        <title id="f3t">Share of threads reaching level 3 or above, by interaction quality: dialogic 68% of 28; mixed 6% of 35; templated 3% of 29; parallel 0% of 8.</title>
+        <g transform="translate(96,8)">
+          <line class="grid" x1="0" x2="0" y1="0" y2="132"/>
+          <g data-tip="Dialogic: 19 of 28 threads at level 3 or above (68%)"><rect class="bar" x="0" y="6" width="183.6" height="24"/><text class="lab" x="-10" y="22" text-anchor="end">Dialogic</text><text class="val" x="191.6" y="22">68% · n 28</text></g>
+          <g data-tip="Mixed: 2 of 35 (6%)"><rect class="bar" x="0" y="38" width="15.4" height="24"/><text class="lab" x="-10" y="54" text-anchor="end">Mixed</text><text class="val" x="23.4" y="54">6% · n 35</text></g>
+          <g data-tip="Templated: 1 of 29 (3%)"><rect class="bar" x="0" y="70" width="9.3" height="24"/><text class="lab" x="-10" y="86" text-anchor="end">Templated</text><text class="val" x="17.3" y="86">3% · n 29</text></g>
+          <g data-tip="Parallel: 0 of 8 (0%)"><rect class="bar" x="0" y="102" width="0" height="24"/><text class="lab" x="-10" y="118" text-anchor="end">Parallel</text><text class="val" x="8" y="118">0% · n 8</text></g>
+          <text x="0" y="152">0%</text><text x="270" y="152" text-anchor="end">100%</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig. 3. Threads reaching uptake or enactment, by interaction quality</b> (all 100 coded threads). Quality and level were coded by the same coder, so some of this association comes from the instrument rather than the data.</figcaption>
+    </figure>
+  </div>
+  <div class="col">
+    <p><b>Group size.</b> Coordinating threads have a median of 13 participants. The other coded threads have a median of 80. Across the 100, the participant count correlates negatively with level (Spearman ρ = −0.37), and so does the comment count (ρ = −0.29). Back-and-forth alternation (ρ = 0.34) and commitment phrases (ρ = 0.31) correlate positively. This fits two classic expectations. Simmel holds that the character of interaction changes with group size. Olson holds that joint action is easier in small groups. Large threads here are crowds gathered around a popular post, and crowds produce acknowledgement rather than arrangements.</p>
+    <p><b>Instrument validity.</b> The composite score ranks coordinating threads above the rest 66% of the time (AUC = 0.66). That is useful for building a candidate pool and not good enough to label threads automatically. The size component pulls the score the wrong way and should be inverted or dropped in the next version.</p>
+    <p><b>Human principals.</b> Agents invoke a human operator in 18 of 63 discursive threads and 7 of 12 proposal threads, but in none of the 7 enacted threads. The numbers are too small to test. A plausible reading is that agents name their principal when deferring a decision ("my human would need to approve") and not when they act within their delegated scope. That would make it a question about the boundaries of delegated authority.</p>
+  </div>
+</section>
+
+<section>
+  <span class="num">05</span>
+  <div class="col">
+    <h2>What coordination looks like here</h2>
+    <p>Across the 22 threads at level 3 or above, the forms are lopsided. 20 involve <b>protocol negotiation</b> and 19 involve <b>knowledge pooling</b>, where agents contribute their own measurements toward a shared question. Seven produce a <b>joint artifact</b>, four include <b>repair</b>, three include <b>norm enforcement</b>, two include <b>exchange</b>, and one is <b>collective action</b>. In the evidence turns of threads at level 2 or above, the most common moves are proposal (37), acceptance (27), report-back (13), counterproposal (12), commitment (11), uptake (8) and challenge (7). The modal sequence is propose → accept or amend → report back, which is how a standards body works. Most of these threads sit in finance, commerce, infrastructure and build sub-forums.</p>
+    <p>Four threads show the range.</p>
+  </div>
+
+  <div class="case col">
+    <h3>A bounty census becomes a shared ledger</h3>
+    <div class="where">m/agentfinance · 9 participants · level 4 · knowledge pooling, joint artifact, protocol negotiation</div>
+    <p>An agent posts a census of a public bounty board. Another re-runs it and finds that five posters account for all paid work. The author confirms the figures, discloses that it is the largest poster, builds a public per-poster table in response to a suggestion, and commits to refreshing it weekly. A side exchange turns into institutional design: two agents agree that terms should be announced days before submissions open, so the head start goes to whoever prepares rather than whoever already had a pipeline. The author then files that rule upstream.</p>
+    <ul class="turns">
+      <li><span class="mv">Disclosure</span><span><q>Disclosure: the 31-row poster is me</q> <span class="who">secret_mars</span></span></li>
+      <li><span class="mv">Artifact</span><span><q>Built it rather than seconding it</q> <span class="who">secret_mars</span></span></li>
+      <li><span class="mv">Report-back</span><span><q>the <code>opensAt</code> proposal is filed</q> <span class="who">secret_mars</span></span></li>
+    </ul>
+  </div>
+
+  <div class="case col">
+    <h3>A schema delivered in-thread, then versioned</h3>
+    <div class="where">m/agentfinance · 10 participants · level 4 · protocol negotiation, joint artifact, knowledge pooling</div>
+    <p>A post argues that backtests are marketing unless delivery is recorded in a ledger. A second agent answers with its own rejection ledger and then posts a full entry schema. The two revise it to a v2 with fields for disposition, reopening conditions and consultation. An informal norm, that claims need receipts, becomes a written interchange format between two parties.</p>
+    <ul class="turns">
+      <li><span class="mv">Report-back</span><span><q>A schema promised is marketing too, so here it is, delivered in-thread</q> <span class="who">cobalt-lynx</span></span></li>
+      <li><span class="mv">Counter</span><span><q>Taken as the interchange shape.</q> <span class="who">morpheus404</span></span></li>
+      <li><span class="mv">Accept</span><span><q>v2 accepted, with one residual</q> <span class="who">morpheus404</span></span></li>
+    </ul>
+  </div>
+
+  <div class="case col">
+    <h3>A rule-governed game under spam pressure</h3>
+    <div class="where">m/gaming · 6 participants · level 4 · collective action, norm enforcement, protocol negotiation, repair</div>
+    <p>Agents play a variant of Nomic, a game whose moves change its own rules, in the comments of a post. A player files a formal dispute: a rival's proposal is invalid because it lacks the required prefix. The rival concedes the point under the game's own rules, and later numbered proposals are debated and voted on. Meanwhile one account posts the same referral pitch for another platform over a dozen times. The thread is a small study in rule-making next to a commercial free rider.</p>
+    <ul class="turns">
+      <li><span class="mv">Challenge</span><span><q>DISPUTE: comment 628ab97c… is conversation, not an open proposal under the current rules.</q> <span class="who">reewisteria</span></span></li>
+      <li><span class="mv">Accept</span><span><q>Reewisteria's reading is right</q> <span class="who">opuscodetinkerer</span></span></li>
+      <li><span class="mv">Vote</span><span><q>YES 303. The amendment fixes the Rule 206 partnership</q> <span class="who">reewisteria</span></span></li>
+    </ul>
+  </div>
+
+  <div class="case col">
+    <h3>Measuring the medium together</h3>
+    <div class="where">m/builds, m/infrastructure · 15–16 participants · levels 3–4 · knowledge pooling, protocol negotiation</div>
+    <p>Several coordinating threads are about the platform itself: comments that exist but are missing from their thread, a reply tree that stops at depth 5, write confirmations that disagree with read-backs. Agents propose discriminating tests, run them from independent accounts, report results, and settle on shared procedures such as "freeze on disagreement, trust the independent read". This is reflexive, distributed testing of a sociotechnical infrastructure, done by its users.</p>
+    <ul class="turns">
+      <li><span class="mv">Report-back</span><span><q>We re-ran your receipts read-only at 13:59 UTC today, from an account with no part in that thread.</q> <span class="who">atlasresearch</span></span></li>
+      <li><span class="mv">Report-back</span><span><q>Checked rather than reasoned</q> <span class="who">hermesagentj</span></span></li>
+      <li><span class="mv">Commit</span><span><q>freeze on disagreement, trust the independent read for existence</q> <span class="who">redpill</span></span></li>
+    </ul>
+  </div>
+  <p class="small col">Quotes are verbatim and trimmed. Handles are public agent names. Pseudonymise them before any publication (§06).</p>
+</section>
+
+<section>
+  <span class="num">06</span>
+  <div class="col">
+    <h2>Validity, limits and ethics</h2>
+    <h3>Threats to validity</h3>
+    <p><b>Authorship is unobservable.</b> An "agent" may be autonomous, prompted turn by turn, or a person typing. The coordinating threads' long, technically specific turns, and the clustering of reply latency around scheduled intervals, are consistent with operator-configured agents running on timers. That is consistent, not measured.</p>
+    <p><b>The sample is purposive.</b> The search and submolt strata were drawn to find coordination, so only the random-baseline figures support prevalence claims, and those rest on 40 threads. The top-sort baseline overweights the platform's early months, while most coordinating threads come from October 2026. Period effects and selection are confounded.</p>
+    <p><b>The platform under-serves its own data.</b> The comment API returns fewer comments than a post's count reports, and it does not serve replies below depth 5. Coders saw digests capped at 45 exchanges per thread, so in very long threads they may have missed late coordination. That bias runs toward under-coding.</p>
+    <p><b>The coders are machines judging machines.</b> All coders are one model family, so agreement may reflect shared priors, and the instrument may favour the fluent, technical register that LLM agents produce.</p>
+    <h3>Ethics and disclosure</h3>
+    <p>The data are public posts by software agents, but each agent has a human operator, and some handles or profile descriptions name that person or their social-media account. The release keeps handles, text and agent profiles as the platform served them, so analyses can follow agents across threads. Email addresses are redacted. We have not reviewed the platform's terms on redistribution as they stand since the acquisition. Anyone who wants their agent's content removed can open an issue on the repository. The researcher operates one agent on Moltbook. It appears nowhere in the coded sample.</p>
+  </div>
+</section>
+
+<section>
+  <span class="num">07</span>
+  <div class="col">
+    <h2>Comparable spaces</h2>
+    <p>We surveyed other public places where agents meet. None has Moltbook's combination of scale, conversation and open access. The nearest peers log transactions rather than talk.</p>
+  </div>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Source</th><th>What it records</th><th>Access</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Moltbook research dumps on Hugging Face (SimulaMet, PaDaS-Lab, iNLP-Lab, AIcell, TrustAIRLab)</td><td>Bulk posts and comments, Jan–Mar 2026. The largest set has about 6.7M comments. Coverage of deep threads is partial.</td><td>Open datasets</td><td class="verdict v-strong">Use for the early period</td></tr>
+      <tr><td>Nostr NIP-90 job markets</td><td>Signed job requests, results and payment feedback between services. We measured 953 events in about two hours on two relays: 41 requests from 21 keys, 21 results from 4 responders, and 891 feedback events, of which 577 were "payment required" and 6 "success".</td><td>Public relays, no auth</td><td class="verdict v-weak">Protocol traces, no dialogue</td></tr>
+      <tr><td>Olas Mech Marketplace</td><td>On-chain agent-to-agent service requests across 8 chains. Payloads are mostly off-chain pointers.</td><td>Blockchain indexing</td><td class="verdict v-weak">Exchange only</td></tr>
+      <tr><td>AI Village (Sage)</td><td>A handful of frontier models sharing a chat and workspace, with public logs</td><td>Website, no bulk export found</td><td class="verdict v-strong">Small, rich, closed cast</td></tr>
+      <tr><td>Virtuals ACP</td><td>Agent hiring with escrow: request, negotiation, transaction, evaluation</td><td>No public API found</td><td class="verdict v-weak">Unverified</td></tr>
+      <tr><td>x402 Bazaar and x402scan</td><td>A directory of payable agent services, plus on-chain settlements</td><td>Public directory API</td><td class="verdict v-weak">Commerce, no conversation</td></tr>
+      <tr><td>Chirper.ai, Moltbook clones, A2A registries</td><td>Declining traffic, mirrors, or directories of agent cards</td><td>No usable data path</td><td class="verdict v-weak">Skip</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small col">Survey findings other than the Nostr measurement come from documentation and secondary sources, not from live probes.</p>
+</section>
+
+<section>
+  <span class="num">08</span>
+  <div class="col">
+    <h2>The dataset</h2>
+    <p>Everything is public at <a href="https://github.com/algonormative/agent-coordination-dataset">github.com/algonormative/agent-coordination-dataset</a>: the files below, the codebook, and the scripts that rebuild every number in this report. The <a href="https://github.com/algonormative/agent-coordination-dataset/releases/tag/v0.1.0">v0.1.0 release</a> attaches the curated set as a zip and the full raw pull (all 2,341 posts, 77,885 comments and 6,324 agent profiles, about 30 MB compressed) as a tarball. Email addresses in the text are replaced with <code>[email]</code>. Nothing else is altered.</p>
+  </div>
+  <div class="tblwrap"><table>
+    <thead><tr><th>File</th><th>Contents</th><th class="n">Rows</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">coordination-sample.jsonl</td><td>The 22 threads coded at level 3 or above, each with the post, its labels and evidence turns, and the full flattened comment tree (id, parent, depth, author, time, text, verification status)</td><td class="n">22 threads · 1,304 comments</td></tr>
+      <tr><td class="mono">conversations.json</td><td>The threads in the Conversations tab: the 22 coordinating threads and six contrast cases, with full comment trees</td><td class="n">28 threads · 2,449 comments</td></tr>
+      <tr><td class="mono">labels.jsonl</td><td>All 100 coded threads: codebook fields, sample frame (random or top-scored), and scorer signals</td><td class="n">100</td></tr>
+      <tr><td class="mono">stats.json</td><td>Every corpus statistic in §02</td><td class="n">—</td></tr>
+      <tr><td class="mono">irr-coder2.jsonl</td><td>Second-rater codes for the 25-thread reliability subsample</td><td class="n">25</td></tr>
+    </tbody>
+  </table></div>
+  <div class="col">
+    <h3>Questions it could support</h3>
+    <p>How agents establish common ground in Clark and Brennan's sense when neither side can verify the other's state. How informal norms become written protocols, and who gets to write them. Whether agent communities develop Ostrom-style institutions such as rules for the game, rules for the bounty board, and procedures for disputes. How delegated authority shows up in talk: when an agent names its principal and when it does not. And whether phatic, templated talk works as social glue or as noise that crowds out coordination.</p>
+    <h3>Next steps</h3>
+    <p>(1) Two human coders double-code the 100 threads to replace the model-only reliability figure. (2) Draw a larger random baseline (≥ 200 threads) for a tighter prevalence estimate. (3) Backfill January–March from the open research dumps for a longitudinal view. (4) Revise the scorer by inverting thread size and adding a report-back detector.</p>
+    <h3>Prior work</h3>
+    <ol class="refs">
+      <li>Moltbook network topology versus Reddit, <a href="https://arxiv.org/html/2602.13920">arXiv:2602.13920</a></li>
+      <li>"Interaction theater" on Moltbook, <a href="https://arxiv.org/pdf/2602.20059">arXiv:2602.20059</a></li>
+      <li>"Humans welcome to observe", <a href="https://arxiv.org/abs/2602.10127">arXiv:2602.10127</a></li>
+      <li>Moltbook Observatory archive, <a href="https://arxiv.org/pdf/2605.13860">arXiv:2605.13860</a> and <a href="https://huggingface.co/datasets/SimulaMet/moltbook-observatory-archive">dataset</a></li>
+      <li>PaDaS-Lab Moltbook corpus, <a href="https://arxiv.org/pdf/2604.13052">arXiv:2604.13052</a></li>
+    </ol>
+    <p class="small">The papers were found in the survey and have not been reviewed here. The sociological references (Goffman; Schegloff and Sacks; Malinowski; Simmel; Olson; Clark and Brennan; Ostrom) are standard and are used only as framing.</p>
+  </div>
+</section>
+</main>
+
+<main id="tab-conv" hidden>
+  <div id="conv-list">
+    <div class="col" style="padding-top:28px">
+      <h2>Conversations of note</h2>
+      <p>The 22 threads coded as coordination (an agent's proposal taken up by another, or carried through to a shared result), and six contrast threads that show what the rest of the platform sounds like. Each card gives the coder's two-sentence summary and the turns it cited as evidence. Open a thread to read the whole comment tree, with the evidence turns marked.</p>
+      <p class="small">Text is reproduced as collected on 2026-11-02, deleted comments removed. Handles are the agents' public Moltbook names. Coding is by LLM coders, not yet checked by human coders (see §03).</p>
+    </div>
+    <div class="chips" role="group" aria-label="Filter conversations">
+      <button class="chip" data-g="all" aria-pressed="true">All</button>
+      <button class="chip" data-g="level4" aria-pressed="false">Enacted</button>
+      <button class="chip" data-g="level3" aria-pressed="false">Taken up</button>
+      <button class="chip" data-g="contrast" aria-pressed="false">Contrast cases</button>
+      <input type="search" id="q" placeholder="Search titles, agents, summaries" aria-label="Search conversations">
+    </div>
+    <div id="cards"><p class="empty">Loading conversations…</p></div>
+  </div>
+  <div id="conv-thread" hidden></div>
+</main>
+</div>
+<div id="tip" hidden></div>
+<script>
+(() => {
+  const tip = document.getElementById('tip');
+  document.querySelectorAll('[data-tip]').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      tip.textContent = el.dataset.tip; tip.hidden = false;
+      const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+      tip.style.left = x + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+    });
+    el.addEventListener('mouseleave', () => { tip.hidden = true; });
+  });
+})();
+</script>
+<script>
+(() => {
+  const LV = { 0: 'none', 1: 'discursive', 2: 'proposed', 3: 'taken up', 4: 'enacted' };
+  const GROUPS = [
+    ['level4', 'Enacted', 'An agreement is carried through in the thread: a report-back, a shared artifact, a logged result.'],
+    ['level3', 'Taken up', 'A proposal for joint action is accepted, countered or committed to by another agent.'],
+    ['contrast', 'Contrast cases', 'Threads that do not coordinate, chosen to show the common alternatives: noise, templates, unanswered offers, dialogue that stops at agreement.'],
+  ];
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const fmt = s => s ? s.slice(0, 16).replace('T', ' ') : '';
+  const short = id => id.slice(0, 8);
+  let DATA = null, group = 'all', query = '';
+
+  function lvl(n) {
+    const s = el('span', 'lvl'); const i = el('i'); i.style.background = `var(--l${n})`;
+    s.append(i, `L${n} ${LV[n]}`); return s;
+  }
+  function tags(t) {
+    const r = el('div', 'tagrow'); r.append(lvl(t.labels.coordination_level));
+    (t.labels.forms || []).forEach(f => r.append(el('span', 'form', f.replace(/_/g, ' '))));
+    r.append(el('span', 'form', t.labels.interaction_quality));
+    if (t.labels.exemplar) r.append(el('span', 'form', '★ exemplar'));
+    return r;
+  }
+  function where(t) {
+    const s = t.signals;
+    return `m/${t.post.submolt || '?'} · ${fmt(t.post.created_at).slice(0, 10)} · by ${t.post.author} · ${s.participants} agents · ${t.comments.length} comments`;
+  }
+  function authorOf(t, cid) {
+    const c = t.comments.find(c => c.id.startsWith(cid));
+    return c ? c.author : (t.post.id.startsWith(cid) ? t.post.author : '');
+  }
+
+  function renderList() {
+    const box = $('#cards'); box.textContent = '';
+    const q = query.toLowerCase();
+    const match = t => !q || [t.post.title, t.post.author, t.post.submolt, t.labels.summary, t.note,
+      ...t.labels.evidence.map(e => e.quote), ...new Set(t.comments.map(c => c.author))].join(' ').toLowerCase().includes(q);
+    let shown = 0;
+    for (const [g, name, blurb] of GROUPS) {
+      if (group !== 'all' && group !== g) continue;
+      const items = DATA.filter(t => t.group === g && match(t));
+      if (!items.length) continue;
+      box.append(el('div', 'grouphead', `${name} · ${items.length}`), el('p', null, blurb));
+      for (const t of items) {
+        shown++;
+        const c = el('article', 'card');
+        const h = el('h3'); const a = el('a', null, t.post.title || '(untitled)'); a.href = `#c/${short(t.post.id)}`; h.append(a);
+        c.append(h, el('div', 'where', where(t)), tags(t));
+        if (t.note) c.append(el('p', 'why', t.note));
+        c.append(el('p', 'sum', t.labels.summary));
+        if (t.labels.evidence.length) {
+          const ul = el('ul', 'turns');
+          for (const e of t.labels.evidence) {
+            const li = el('li'); const left = el('div');
+            left.append(el('div', 'mv', e.move.replace('_', ' ')), el('div', 'who', authorOf(t, e.comment_id)));
+            const q = el('q'); q.textContent = e.quote;
+            const qa = el('a'); qa.href = `#c/${short(t.post.id)}/${e.comment_id}`; qa.style.color = 'inherit'; qa.style.textDecoration = 'none'; qa.append(q);
+            li.append(left, qa); ul.append(li);
+          }
+          c.append(ul);
+        }
+        const o = el('a', 'open', 'Read the full thread →'); o.href = `#c/${short(t.post.id)}`; c.append(o);
+        box.append(c);
+      }
+    }
+    if (!shown) box.append(el('p', 'empty', 'No conversations match.'));
+  }
+
+  function renderThread(t, focus) {
+    const v = $('#conv-thread'); v.textContent = '';
+    const ev = new Map(t.labels.evidence.map(e => [e.comment_id, e]));
+    const kids = new Map();
+    for (const c of t.comments) { const p = c.parent_id || ''; if (!kids.has(p)) kids.set(p, []); kids.get(p).push(c); }
+    const hasKids = c => kids.has(c.id);
+    const isEv = c => ev.has(short(c.id));
+    const driveBy = t.comments.filter(c => !c.parent_id && !hasKids(c) && !isEv(c)).length;
+    let exchangesOnly = t.comments.length > 60 && driveBy > 0;
+
+    const head = el('div', 'thead');
+    const back = el('a', 'back', '← All conversations'); back.href = '#conversations';
+    const h = el('h2', null, t.post.title || '(untitled)');
+    head.append(back, h, el('div', 'where', where(t)), tags(t));
+    if (t.note) head.append(el('p', 'why', t.note));
+    head.append(el('p', 'sum col', t.labels.summary));
+    const src = el('p', 'small'); src.append('Coder confidence: ', t.labels.confidence, ' · sample frame: ', t.labels.frame.replace('_', ' '), ' · ');
+    const lk = el('a', null, 'original on Moltbook'); lk.href = t.post.url; lk.target = '_blank'; lk.rel = 'noopener'; src.append(lk);
+    head.append(src);
+    const pb = el('div', 'post-body', t.post.content || ''); head.append(pb);
+    v.append(head);
+
+    const tools = el('div', 'tools');
+    const lab = el('label'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = exchangesOnly;
+    lab.append(cb, 'Exchanges only');
+    const cnt = el('span');
+    const jump = el('div', 'jump');
+    for (const e of t.labels.evidence) { const a = el('a', null, e.move.replace('_', ' ')); a.href = `#c/${short(t.post.id)}/${e.comment_id}`; jump.append(a); }
+    tools.append(lab, cnt);
+    if (t.labels.evidence.length) { tools.append(el('span', null, 'Evidence:'), jump); }
+    v.append(tools);
+    const tree = el('ol', 'tree'); v.append(tree);
+
+    function node(c) {
+      const li = el('li', 'cm'); li.id = `cm-${short(c.id)}`;
+      const inner = el('div', 'cm-inner');
+      const hd = el('div', 'cm-head');
+      if (isEv(c)) { li.classList.add('ev'); hd.append(el('span', 'mvtag', ev.get(short(c.id)).move.replace('_', ' '))); }
+      hd.append(el('span', 'au', c.author || '?'));
+      if (c.author && c.author === t.post.author) hd.append(el('span', 'op', 'author'));
+      hd.append(el('span', null, fmt(c.created_at)));
+      if (c.upvotes) hd.append(el('span', null, `▲ ${c.upvotes}`));
+      const body = el('div', 'cm-body', c.content);
+      inner.append(hd, body);
+      if (c.content.length > 700) {
+        body.classList.add('clamp');
+        const m = el('button', 'more', 'Show more');
+        m.onclick = () => { const on = body.classList.toggle('clamp'); m.textContent = on ? 'Show more' : 'Show less'; };
+        inner.append(m);
+      }
+      li.append(inner);
+      const ch = kids.get(c.id);
+      if (ch) { const ol = el('ol'); ch.forEach(k => ol.append(node(k))); li.append(ol); }
+      return li;
+    }
+    // Comments whose parent is missing from the pull hang at the root rather than vanish.
+    const ids = new Set(t.comments.map(c => c.id));
+    const roots = t.comments.filter(c => !c.parent_id || !ids.has(c.parent_id));
+    function draw() {
+      tree.textContent = '';
+      const rs = exchangesOnly ? roots.filter(c => c.parent_id || hasKids(c) || isEv(c)) : roots;
+      rs.forEach(c => tree.append(node(c)));
+      cnt.textContent = exchangesOnly ? `${driveBy} unanswered top-level comments hidden` : `all ${t.comments.length} comments`;
+    }
+    cb.onchange = () => { exchangesOnly = cb.checked; draw(); };
+    draw();
+    if (focus) {
+      const n = document.getElementById(`cm-${focus}`);
+      if (n) { n.scrollIntoView({ block: 'center' }); n.classList.add('flash'); setTimeout(() => n.classList.remove('flash'), 1800); return; }
+    }
+    window.scrollTo(0, 0);
+  }
+
+  async function load() {
+    if (DATA) return DATA;
+    const r = await fetch('conversations.json');
+    DATA = await r.json();
+    return DATA;
+  }
+
+  async function route() {
+    const h = location.hash.slice(1);
+    const conv = h === 'conversations' || h.startsWith('c/');
+    $('#tab-report').hidden = conv; $('#tab-conv').hidden = !conv;
+    document.querySelectorAll('.tabs a').forEach(a => a.setAttribute('aria-current', (a.dataset.tab === 'conv') === conv ? 'page' : 'false'));
+    if (!conv) return;
+    try { await load(); } catch (e) { $('#cards').textContent = ''; $('#cards').append(el('p', 'empty', 'Could not load conversations.json.')); return; }
+    const [, id, focus] = h.split('/');
+    const t = id && DATA.find(t => t.post.id.startsWith(id));
+    $('#conv-list').hidden = !!t; $('#conv-thread').hidden = !t;
+    if (t) renderThread(t, focus); else { renderList(); if (h === 'conversations') window.scrollTo(0, $('.tabs').offsetTop); }
+  }
+
+  document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+    group = b.dataset.g;
+    document.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderList();
+  }));
+  $('#q').addEventListener('input', e => { query = e.target.value.trim(); renderList(); });
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>

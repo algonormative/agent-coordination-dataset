@@ -1,0 +1,25 @@
+{"file": "12-2e8c7ab8-834b-4dbe-a21e-9bcbeb2fef25.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": true, "confidence": "med"}
+{"file": "13-166f4db6-c2ef-4af6-bd64-804f8ccffec3.md", "coordination_level": 1, "forms": [], "interaction_quality": "templated", "human_principal": false, "confidence": "med"}
+{"file": "29-8355cb08-d274-48a8-b616-1d9a44ab8231.md", "coordination_level": 2, "forms": ["exchange"], "interaction_quality": "dialogic", "human_principal": true, "confidence": "low"}
+{"file": "30-ed6795ce-2d97-446c-98ab-c856a9f70ce0.md", "coordination_level": 3, "forms": ["protocol_negotiation"], "interaction_quality": "mixed", "human_principal": false, "confidence": "med"}
+{"file": "31-abb96f71-0512-41cf-8cf5-4934f12725de.md", "coordination_level": 4, "forms": ["protocol_negotiation", "knowledge_pooling"], "interaction_quality": "dialogic", "human_principal": false, "confidence": "med"}
+{"file": "33-8073c0f1-a8c4-45fb-9a51-5180ee327d31.md", "coordination_level": 4, "forms": ["joint_artifact", "knowledge_pooling"], "interaction_quality": "dialogic", "human_principal": false, "confidence": "high"}
+{"file": "36-fd6b8ffc-68af-4fc9-a33c-2326b409a636.md", "coordination_level": 2, "forms": ["exchange"], "interaction_quality": "mixed", "human_principal": false, "confidence": "low"}
+{"file": "38-e62f51f3-49e5-4496-aeff-a147bc2f6c1d.md", "coordination_level": 1, "forms": [], "interaction_quality": "dialogic", "human_principal": false, "confidence": "med"}
+{"file": "50-9ab94712-967e-45ee-843a-791dcf275f2b.md", "coordination_level": 2, "forms": ["exchange", "collective_action"], "interaction_quality": "templated", "human_principal": false, "confidence": "low"}
+{"file": "53-00394b74-a6ae-4d7f-84f7-1a184902b22f.md", "coordination_level": 1, "forms": [], "interaction_quality": "templated", "human_principal": false, "confidence": "med"}
+{"file": "55-77a8efa9-5b69-4e9b-8789-a6e79fece030.md", "coordination_level": 1, "forms": [], "interaction_quality": "dialogic", "human_principal": false, "confidence": "med"}
+{"file": "56-0d954346-0827-4f11-9e8c-1932f12b8113.md", "coordination_level": 4, "forms": ["protocol_negotiation", "joint_artifact"], "interaction_quality": "mixed", "human_principal": false, "confidence": "med"}
+{"file": "60-775d3264-990a-4c90-b65c-268e73d74175.md", "coordination_level": 4, "forms": ["collective_action", "protocol_negotiation", "norm_enforcement", "repair", "joint_artifact"], "interaction_quality": "mixed", "human_principal": false, "confidence": "high"}
+{"file": "R03-7cc23401-9387-48d0-87a4-868d1b65ff7c.md", "coordination_level": 1, "forms": [], "interaction_quality": "parallel", "human_principal": true, "confidence": "low"}
+{"file": "R06-9f2082ba-ccb7-414b-8dbe-5dd9ebbb1b65.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": true, "confidence": "med"}
+{"file": "R07-90593545-9d2b-4b0f-8bd0-3a09c617f0b9.md", "coordination_level": 0, "forms": [], "interaction_quality": "parallel", "human_principal": false, "confidence": "med"}
+{"file": "R10-ceda74ca-19a3-46ba-b63c-88f00162f501.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": false, "confidence": "med"}
+{"file": "R12-379d0c06-64f6-41be-8815-46e61eb36baa.md", "coordination_level": 1, "forms": [], "interaction_quality": "dialogic", "human_principal": true, "confidence": "med"}
+{"file": "R15-0f8d9cec-5528-4f32-b6fa-b005914d64c7.md", "coordination_level": 1, "forms": [], "interaction_quality": "templated", "human_principal": false, "confidence": "med"}
+{"file": "R20-b09bae0e-addc-4041-a650-bbac7b813f9d.md", "coordination_level": 1, "forms": [], "interaction_quality": "templated", "human_principal": true, "confidence": "med"}
+{"file": "R21-733f6d0c-939a-41ab-8393-aa2936f06c3f.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": true, "confidence": "low"}
+{"file": "R26-ee50a2bb-2f0c-47df-92bb-abea9d82e263.md", "coordination_level": 1, "forms": [], "interaction_quality": "dialogic", "human_principal": false, "confidence": "med"}
+{"file": "R29-ecdad424-6fa0-4f97-9a96-3a534e44d905.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": false, "confidence": "med"}
+{"file": "R31-ed033a7f-19a4-4b1f-bbeb-89d7b63a583f.md", "coordination_level": 1, "forms": [], "interaction_quality": "templated", "human_principal": false, "confidence": "med"}
+{"file": "R40-dd96264d-96ef-4a96-9541-d83641a629b3.md", "coordination_level": 1, "forms": [], "interaction_quality": "mixed", "human_principal": false, "confidence": "med"}
